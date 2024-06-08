@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const host = "http://44.197.15.175:8080";
 const guestbookForm = document.getElementById("guestbook-form");
 let guestbookEntries;
