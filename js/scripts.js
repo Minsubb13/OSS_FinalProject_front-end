@@ -4,7 +4,7 @@ const guestbookEntries = document.querySelector("#guestbook-entries");
 
 function getGuestbookEntries() {
   axios
-    .get(`${host}/guestbook`)
+    .get(`${host}/comment`)
     .then((response) => {
       renderGuestbookEntries(response.data);
     })
@@ -40,21 +40,21 @@ function addGuestbookEntry(event) {
   if (name === "" || message === "") return;
 
   const entryData = {
-    name: name,
-    message: message,
+    id: Date.now().toString(), // 고유한 ID 생성
+    comment: message,
   };
 
   axios
-    .post(`${host}/guestbook`, entryData)
+    .post(`${host}/comment`, entryData)
     .then((response) => {
       const entry = response.data;
 
       const li = document.createElement("li");
-      li.textContent = `${entry.name}: ${entry.message}`;
+      li.textContent = `${name}: ${message}`;
 
       const deleteBtn = document.createElement("button");
       deleteBtn.classList.add("delete-button");
-      deleteBtn.textContent = "Delete";
+      deleteBtn.textContent = "X";
       deleteBtn.addEventListener("click", function () {
         deleteGuestbookEntry(entry.id);
       });
@@ -68,10 +68,12 @@ function addGuestbookEntry(event) {
       console.error("Error adding guestbook entry: ", error);
     });
 }
+
 function deleteGuestbookEntry(entryId) {
   axios
-    .delete(`${host}/guestbook/${entryId}`)
+    .delete(`${host}/comment/${entryId}`)
     .then(function (response) {
+      console.log("Guestbook entry deleted successfully");
       getGuestbookEntries();
     })
     .catch(function (error) {
