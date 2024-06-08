@@ -1,68 +1,71 @@
-const host = "http://44.197.15.175:8080";
-const guestbookForm = document.querySelector("#guestbook-form");
-const guestbookEntries = document.querySelector("#guestbook-entries");
+const host = "http://127.0.0.1:80";
+const guestbookForm = document.getElementById("guestbook-form");
+let guestbookEntries;
 
 function getGuestbookEntries() {
   axios
     .get(`${host}/comment`)
     .then((response) => {
+      console.log(response.data);
       renderGuestbookEntries(response.data);
     })
     .catch((error) => {
-      console.error("Error fetching guestbook entries: ", error);
+      console.error("Error fetching guestbook entries:", error);
     });
 }
 
-function renderGuestbookEntries(entries) {
+function renderGuestbookEntries(data) {
   guestbookEntries.innerHTML = "";
-  entries.forEach((entry) => {
-    const li = document.createElement("li");
-    li.textContent = `${entry.name}: ${entry.message}`;
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.classList.add("delete-button");
-    deleteBtn.textContent = "X";
-    deleteBtn.addEventListener("click", function () {
-      deleteGuestbookEntry(entry.id);
-    });
-
-    li.appendChild(deleteBtn);
-    guestbookEntries.appendChild(li);
-  });
-}
-
-function addGuestbookEntry(event) {
-  event.preventDefault();
-
-  const name = document.querySelector("#name").value.trim();
-  const message = document.querySelector("#message").value.trim();
-
-  if (name === "" || message === "") return;
-
-  const entryData = {
-    id: Date.now().toString(), // 고유한 ID 생성
-    comment: message,
-  };
-
-  axios
-    .post(`${host}/comment`, entryData)
-    .then((response) => {
-      const entry = response.data;
-
-      const li = document.createElement("li");
-      li.textContent = `${name}: ${message}`;
+  if (data && data.comments && Array.isArray(data.comments)) {
+    data.comments.forEach((entry) => {
+      const commentDiv = document.createElement("div");
+      commentDiv.classList.add("comment");
+      commentDiv.textContent = `${entry.name}: ${entry.comment}`;
+      guestbookEntries.appendChild(commentDiv);
 
       const deleteBtn = document.createElement("button");
-      deleteBtn.classList.add("delete-button");
+      deleteBtn.classList.add("delete-btn");
       deleteBtn.textContent = "X";
       deleteBtn.addEventListener("click", function () {
         deleteGuestbookEntry(entry.id);
       });
 
-      li.appendChild(deleteBtn);
-      guestbookEntries.appendChild(li);
+      commentDiv.appendChild(deleteBtn);
+    });
+  } else {
+    console.error("Invalid response data:", data);
+  }
+}
 
-      guestbookForm.reset();
+window.addEventListener("DOMContentLoaded", function () {
+  guestbookEntries = document.getElementById("guestbook-entries");
+  const guestbookForm = document.getElementById("guestbook-form");
+  guestbookForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    addGuestbookEntry();
+  });
+
+  getGuestbookEntries();
+});
+
+function addGuestbookEntry() {
+  const name = document.getElementById("name").value.trim();
+  const message = document.getElementById("message").value.trim();
+
+  let guestbookData = {
+    id: 0,
+    name: name,
+    comment: message,
+  };
+
+  if (name === "" || message === "") return;
+
+  axios
+    .post(`${host}/comment`, guestbookData)
+    .then((response) => {
+      document.getElementById("name").value = "";
+      document.getElementById("message").value = "";
+      getGuestbookEntries();
     })
     .catch((error) => {
       console.error("Error adding guestbook entry: ", error);
@@ -73,7 +76,7 @@ function deleteGuestbookEntry(entryId) {
   axios
     .delete(`${host}/comment/${entryId}`)
     .then(function (response) {
-      console.log("Guestbook entry deleted successfully");
+      console.log("Guestbook entry deleted: ", response.data);
       getGuestbookEntries();
     })
     .catch(function (error) {
@@ -81,19 +84,8 @@ function deleteGuestbookEntry(entryId) {
     });
 }
 
-guestbookForm.addEventListener("submit", addGuestbookEntry);
-
-window.addEventListener("DOMContentLoaded", function () {
-  getGuestbookEntries();
-});
-
-const moreInfoBtn = document.querySelector("#more-info");
-const additionalInfo = document.querySelector(".additional-info");
-
-moreInfoBtn.addEventListener("click", function () {
-  if (additionalInfo.style.display === "none") {
-    additionalInfo.style.display = "block";
-  } else {
-    additionalInfo.style.display = "none";
-  }
-});
+// document.getElementById("more-info").addEventListener("click", function () {
+//   const additionalInfo = document.getElementById("additional-info");
+//   additionalInfo.style.display =
+//     additionalInfo.style.display === "none" ? "block" : "none";
+// });
