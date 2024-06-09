@@ -47,6 +47,24 @@ h2 {
   margin-top: 0;
 }
 
+.profile {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 1em;
+}
+
+.profile img {
+  width: 200px;
+  height: auto;
+  border-radius: 10%;
+  margin-bottom: 1em;
+}
+.profile p {
+  margin-left: 10px;
+  font-size: 1.2em;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -110,4 +128,10 @@ form button:hover {
   background-color: #f0f0f0;
   padding: 10px;
   margin-bottom: 10px;
+}
+
+/* comment 추가시 p요소를 추가하게 되는데, 그 요소 수정 */
+p {
+  margin: 0.5px 0;
+  padding: 2px;
 }

@@ -1,4 +1,5 @@
-const host = "http://44.197.15.175:8080";
+// const host = "http://44.197.15.175:8080";
+const host = "http://127.0.0.1:80";
 const guestbookForm = document.getElementById("guestbook-form");
 let guestbookEntries;
 
@@ -18,9 +19,20 @@ function renderGuestbookEntries(data) {
   guestbookEntries.innerHTML = "";
   if (data && data.comments && Array.isArray(data.comments)) {
     data.comments.forEach((entry) => {
+      // renderGuestbookEntries 함수를 호출하면, 요소들을 받아 div,p요소로 guestbookEntries에 추가
+      // div 요소 생성
       const commentDiv = document.createElement("div");
       commentDiv.classList.add("comment");
-      commentDiv.textContent = `${entry.name}: ${entry.comment}`;
+      // div요소 안에 p요소 생성
+      const nameElement = document.createElement("p");
+      nameElement.classList.add("name");
+      nameElement.textContent = entry.name; // name
+      commentDiv.appendChild(nameElement);
+
+      const messageElement = document.createElement("p");
+      messageElement.textContent = entry.comment; // comment
+      commentDiv.appendChild(messageElement);
+
       guestbookEntries.appendChild(commentDiv);
 
       const deleteBtn = document.createElement("button");
@@ -83,9 +95,3 @@ function deleteGuestbookEntry(entryId) {
       console.error("Error deleting guestbook entry: ", error);
     });
 }
-
-// document.getElementById("more-info").addEventListener("click", function () {
-//   const additionalInfo = document.getElementById("additional-info");
-//   additionalInfo.style.display =
-//     additionalInfo.style.display === "none" ? "block" : "none";
-// });
